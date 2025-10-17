@@ -1,6 +1,9 @@
-node_modules
-.dsx/
-dist
-.vscode/
+node_modules/
+build/
+dist/
 .env
+.env.local
+npm-debug.log*
 .DS_Store
+.idea/
+*.swp
