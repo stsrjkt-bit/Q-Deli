@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite --port 3000 --strictPort",
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo \"No frontend tests yet\" && exit 0"
