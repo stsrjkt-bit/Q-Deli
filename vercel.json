@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd src && npm install && npm run build",
+  "outputDirectory": "src/dist",
+  "framework": null,
+  "installCommand": "echo 'Dependencies installed via buildCommand'",
+  "devCommand": "cd src && npm run dev",
+  "env": {
+    "VITE_FIREBASE_PROJECT_ID": "@firebase_project_id",
+    "VITE_CLAUDE_API_KEY": "@claude_api_key",
+    "VITE_YOUTUBE_API_KEY": "@youtube_api_key",
+    "VITE_GOOGLE_SPEECH_API_KEY": "@google_speech_api_key"
+  }
+}
