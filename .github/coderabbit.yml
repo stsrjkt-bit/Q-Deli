@@ -1,0 +1,69 @@
+language: en-US
+early_access: false
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+      - develop
+  
+chat:
+  auto_reply: true
+
+# Security and code quality checks
+checks:
+  # Detect API keys and secrets
+  secrets:
+    enabled: true
+    patterns:
+      - "FIREBASE_"
+      - "CLAUDE_API_KEY"
+      - "YOUTUBE_API_KEY"
+      - "GOOGLE_SPEECH_API_KEY"
+      - "API_KEY"
+      - "SECRET"
+      - "TOKEN"
+      - "PASSWORD"
+  
+  # Security vulnerabilities
+  security:
+    enabled: true
+  
+  # Code quality
+  quality:
+    enabled: true
+    
+  # Auto-fix suggestions
+  auto_fix:
+    enabled: true
+    suggestions: true
+
+# Review settings
+review_settings:
+  # Focus areas
+  focus:
+    - security
+    - performance
+    - best_practices
+    - error_handling
+    - test_coverage
+  
+  # Ignore patterns
+  ignore:
+    - "**/*.md"
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/*.lock"
+
+# Comment settings
+comments:
+  style: concise
+  tone: constructive
