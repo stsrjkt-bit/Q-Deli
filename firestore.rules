@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ユーザードキュメント：本人のみ読み書き
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // チャット投稿：認証ユーザーなら読み込み、本人なら書き込み
+    match /chat_submissions/{submissionId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // 英作文：認証ユーザーなら読み込み、本人なら書き込み
+    match /essays/{essayId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // 暗記カード：認証ユーザーなら読み込み、本人なら書き込み
+    match /flashcards/{flashcardId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // 動画検索履歴：認証ユーザーなら読み込み、本人なら書き込み
+    match /video_searches/{searchId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // 音声ファイル：認証ユーザーなら読み込み、本人なら書き込み
+    match /audio_files/{audioId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // 調査レポート：認証ユーザーなら読み込み、本人なら書き込み
+    match /research_reports/{reportId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // 予測テスト：認証ユーザーなら読み込み、本人なら書き込み
+    match /predicted_tests/{testId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // ポイント取引履歴：本人のみ読み込み、サーバーのみ書き込み
+    match /point_transactions/{transactionId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow write: if false; // サーバー側のみ書き込み可能
+    }
+    
+    // システムステータス：全員読み込み可、書き込み不可
+    match /system_status/{statusId} {
+      allow read: if true;
+      allow write: if false; // サーバー側のみ書き込み可能
+    }
+  }
+}

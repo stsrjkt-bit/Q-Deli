@@ -1,53 +1,94 @@
-name: CI/CD Pipeline
+name: Q-Deli CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, develop ]
   pull_request:
-    branches:
-      - main
+    branches: [ main, develop ]
 
 jobs:
-  test:
+  # フロントエンドテスト
+  frontend-test:
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        node-version: [20.x]
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: src/package.json
+    
+    - name: Install dependencies
+      run: |
+        cd src
+        npm ci
+    
+    - name: Run linter
+      run: |
+        cd src
+        npm run lint
+    
+    - name: Run tests
+      run: |
+        cd src
+        npm run test
+    
+    - name: Build
+      run: |
+        cd src
+        npm run build
+
+  # バックエンドテスト
+  backend-test:
+    runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./functions
-      
-      - name: Run tests
-        run: npm test
-        working-directory: ./functions
-        env:
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          GOOGLE_SPEECH_API_KEY: ${{ secrets.GOOGLE_SPEECH_API_KEY }}
-      
-      - name: Build application
-        run: npm run build
-        working-directory: ./functions
-        env:
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          GOOGLE_SPEECH_API_KEY: ${{ secrets.GOOGLE_SPEECH_API_KEY }}
-      
-      - name: Report test results
-        if: always()
-        run: echo "✅ CI Pipeline completed successfully"
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: functions/package.json
+    
+    - name: Install dependencies
+      run: |
+        cd functions
+        npm ci
+    
+    - name: Run linter
+      run: |
+        cd functions
+        npm run lint
+    
+    - name: Run tests
+      run: |
+        cd functions
+        npm run test
+
+  # デプロイ（mainブランチのみ）
+  deploy:
+    needs: [frontend-test, backend-test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install Firebase CLI
+      run: npm install -g firebase-tools
+    
+    - name: Deploy to Firebase
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      run: |
+        firebase deploy --only hosting,functions --token "$FIREBASE_TOKEN"
