@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "cd src && npm install && npm run build",
-  "outputDirectory": "src/dist",
+  "outputDirectory": ".",
   "env": {
     "FIREBASE_PROJECT_ID": "@FIREBASE_PROJECT_ID",
     "CLAUDE_API_KEY": "@CLAUDE_API_KEY",
