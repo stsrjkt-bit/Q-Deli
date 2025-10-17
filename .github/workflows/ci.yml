@@ -1,63 +1,70 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-and-test:
+  test-and-build:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
+      
+      # Frontend tests and build
+      - name: Setup Node.js for frontend
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: '18'
           cache: 'npm'
-
-      - name: Install backend dependencies
+          cache-dependency-path: src/package-lock.json
+      
+      - name: Install frontend dependencies
+        working-directory: ./src
         run: npm install
-        working-directory: ./functions
-
-      - name: Run backend tests
+      
+      - name: Run frontend tests
+        working-directory: ./src
         run: npm test
+      
+      - name: Build frontend
+        working-directory: ./src
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      
+      # Backend tests
+      - name: Install backend dependencies
         working-directory: ./functions
+        run: npm install
+      
+      - name: Run backend tests
+        working-directory: ./functions
+        run: npm test
         env:
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           GOOGLE_SPEECH_API_KEY: ${{ secrets.GOOGLE_SPEECH_API_KEY }}
-
-      - name: Build backend
-        run: npm run build
+      
+      - name: Run backend lint
         working-directory: ./functions
-
-      - name: Install frontend dependencies
-        run: npm install
-        working-directory: ./src
-
-      - name: Build frontend
-        run: npm run build
-        working-directory: ./src
-
-      - name: Report status
-        if: always()
-        run: echo "✅ CI completed with status ${{ job.status }}"
-
-      - name: Comment results on commit
-        if: always()
-        uses: actions/github-script@v7
+        run: npm run lint
+      
+      # Upload build artifacts
+      - name: Upload frontend build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const status = core.getInput('status') || process.env.GITHUB_JOB || 'unknown';
-            const body = `CI summary:\n- Backend tests/build: completed\n- Frontend build: completed\n- Overall status: ${'${{ job.status }}'}`;
-            await github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-              body
-            });
+          name: frontend-build
+          path: src/dist/
+          retention-days: 7

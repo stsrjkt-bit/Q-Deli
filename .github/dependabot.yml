@@ -1,13 +1,59 @@
 version: 2
 updates:
+  # Frontend npm dependencies
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/src"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
     open-pull-requests-limit: 10
-
-  - package-ecosystem: "pip"
+    reviewers:
+      - "q-deli-team"
+    labels:
+      - "dependencies"
+      - "frontend"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: increase
+    allow:
+      - dependency-type: "all"
+    
+  # Backend npm dependencies
+  - package-ecosystem: "npm"
     directory: "/functions"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
     open-pull-requests-limit: 10
+    reviewers:
+      - "q-deli-team"
+    labels:
+      - "dependencies"
+      - "backend"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: increase
+    allow:
+      - dependency-type: "all"
+    
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
