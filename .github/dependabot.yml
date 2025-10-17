@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/functions"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "02:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "stsrjkt-bit"
+    assignees:
+      - "stsrjkt-bit"
+    allow:
+      - dependency-type: "all"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    reviewers:
+      - "stsrjkt-bit"
+    assignees:
+      - "stsrjkt-bit"
