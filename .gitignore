@@ -1,0 +1,12 @@
+.env
+.env.local
+.env.*.local
+*.key
+node_modules/
+.DS_Store
+dist/
+build/
+.firebase/
+.firebaserc
+functions/.env
+src/.env
